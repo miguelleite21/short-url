@@ -1,23 +1,23 @@
-import { Entity, PrimaryKey, Property, Unique } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, Unique } from "@mikro-orm/core";
 
 @Entity()
-@Unique({ properties: ['email'] })
+@Unique({ properties: ["email"] })
 export class User {
-  @PrimaryKey()
-  id!: number;
+	@PrimaryKey()
+	id!: number;
 
-  @Property()
-  email!: string;
+	@Property()
+	email!: string;
 
-  @Property()
-  passwordHash!: string;
+	@Property()
+	passwordHash!: string;
 
-  @Property({ onCreate: () => new Date() })
-  createdAt?: Date = new Date();
+	@Property({ onCreate: () => new Date() })
+	createdAt?: Date = new Date();
 
-  @Property({ onUpdate: () => new Date(), nullable: true })
-  updatedAt?: Date;
+	@Property({ onUpdate: () => new Date(), nullable: true })
+	updatedAt?: Date;
 
-  @Property({ nullable: true })
-  deletedAt?: Date;
+	@Property({ nullable: true })
+	deletedAt?: Date;
 }
