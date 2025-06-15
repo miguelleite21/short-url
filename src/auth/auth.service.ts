@@ -11,7 +11,7 @@ export class AuthService {
 		private readonly jwtService: JwtService
 	) {}
 
-	async register(email: string, password: string): Promise<User> {
+	async register(email: string, password: string): Promise<string> {
 		const existing = await this.em.findOne(User, { email });
 		if (existing) throw new BadRequestException("Email is already registered");
 
@@ -21,7 +21,7 @@ export class AuthService {
 			passwordHash: hashed
 		});
 		await this.em.persistAndFlush(user);
-		return user;
+		return "User Created Successfully";
 	}
 
 	async login(email: string, password: string): Promise<{ token: string }> {

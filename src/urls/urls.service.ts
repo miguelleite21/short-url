@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { ShortUrl } from "./entities/url.entity";
+import { FormattedCreateUrl, FormattedUrl } from "./dto/url-return.dto";
 
 @Injectable()
 export class UrlsService {
@@ -9,19 +10,24 @@ export class UrlsService {
 
 	constructor(private readonly em: EntityManager) {}
 
-	async shorten(originalUrl: string, userId?: number): Promise<ShortUrl> {
+	async shorten(Url: string, userId?: number): Promise<FormattedCreateUrl> {
 		const shortCode = await this.generateUniqueSlug();
 		const url = this.em.create(ShortUrl, {
 			shortCode,
-			targetUrl: originalUrl,
+			targetUrl: Url,
 			owner: userId ?? undefined,
 			clickCount: 0
 		});
 		await this.em.persistAndFlush(url);
-		return url;
+		const { owner: _, ...rest } = url;
+		return {
+			...rest,
+			createdAt: url.createdAt
+				? url.createdAt.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+				: ""
+		};
 	}
 
-	//retornar id code e url
 	private generateSlug(): string {
 		let result = "";
 		const { alphabet, slugLength } = this;
@@ -50,24 +56,52 @@ export class UrlsService {
 		url.clickCount++;
 		await this.em.flush();
 	}
-	// nao pode retornar erro se nao achar tem que retornar array vazio
-	//retornar id code e url
-	async list(userId: number) {
-		return this.em.findAll(ShortUrl, { where: { owner: userId, deletedAt: null } });
+
+	async list(userId: number): Promise<FormattedUrl[]> {
+		const results = await this.em.findAll(ShortUrl, {
+			where: { owner: userId, deletedAt: null },
+			fields: ["id", "shortCode", "targetUrl", "clickCount", "createdAt", "updatedAt"]
+		});
+
+		return (results ?? []).map((url) => ({
+			...url,
+			createdAt: url.createdAt
+				? new Date(url.createdAt).toLocaleString("pt-BR", {
+						dateStyle: "short",
+						timeStyle: "short"
+					})
+				: "",
+			updatedAt: url.updatedAt
+				? new Date(url.updatedAt).toLocaleString("pt-BR", {
+						dateStyle: "short",
+						timeStyle: "short"
+					})
+				: ""
+		}));
 	}
 
-	//retornar id code e url
-	async update(id: number, newUrl: string, userId: number): Promise<ShortUrl> {
+	async update(
+		id: number,
+		newUrl: string,
+		userId: number
+	): Promise<Pick<ShortUrl, "id" | "shortCode" | "targetUrl">> {
 		const url = await this.em.findOne(ShortUrl, { id, deletedAt: null, owner: userId });
 		if (!url) throw new NotFoundException("URL not found");
 		url.targetUrl = newUrl;
 		await this.em.flush();
-		return url;
+		return {
+			id: url.id,
+			shortCode: url.shortCode,
+			targetUrl: url.targetUrl
+		};
 	}
 
-	async delete(id: number, userId: number): Promise<void> {
+	async delete(id: number, userId: number): Promise<string> {
 		const url = await this.em.findOne(ShortUrl, { id, owner: userId, deletedAt: null });
 		if (!url) throw new NotFoundException("URL not found");
-		await this.em.removeAndFlush(url);
+
+		url.deletedAt = new Date();
+		await this.em.flush();
+		return "URL deleted successfully";
 	}
 }
