@@ -4,15 +4,16 @@ import { UrlsService } from './urls.service';
 import { CreateUrlDto } from './dto/create-url.dto';
 import { UpdateUrlDto } from './dto/update-url.dto';
 import { Response } from 'express';
+import { AttachUserGuard } from 'src/auth/guards/attach-user.guard';
 
 @Controller()
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AttachUserGuard)
   @Post('urls/shorten')
   shorten(@Body() body: CreateUrlDto, @Req() req) {
-    return this.urlsService.shorten(body.originalUrl, req.user.id);
+    return this.urlsService.shorten(body.originalUrl, req?.user?.id);
   }
 
   @Get(':slug')
@@ -25,7 +26,6 @@ export class UrlsController {
   @UseGuards(JwtAuthGuard)
   @Get("urls/list")
   async list(@Req() req) {
-    console.log(2)
     const urls = await this.urlsService.list(req.user.id);
     return urls
   }
