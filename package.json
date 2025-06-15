@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main.js",
     "lint": "eslint . --ext .ts --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -24,8 +24,7 @@
     "migration:force": "npx mikro-orm migration:up",
     "migration:pending": "npx mikro-orm migration:pending",
     "migration:fresh": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:fresh",
-    "migrate": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:up",
-    "seeder:run": "npx mikro-orm seeder:run"
+    "migrate": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:up"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.4.16",

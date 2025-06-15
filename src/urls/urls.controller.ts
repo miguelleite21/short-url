@@ -24,7 +24,7 @@ export class UrlsController {
 	@UseGuards(AttachUserGuard)
 	@Post("urls/shorten")
 	shorten(@Body() body: CreateUrlDto, @Req() req) {
-		return this.urlsService.shorten(body.originalUrl, req?.user?.id);
+		return this.urlsService.shorten(body.url, req?.user?.id);
 	}
 
 	@Get(":slug")
@@ -44,7 +44,7 @@ export class UrlsController {
 	@UseGuards(JwtAuthGuard)
 	@Put("urls/:id")
 	update(@Param("id") id: number, @Body() body: UpdateUrlDto, @Req() req) {
-		return this.urlsService.update(id, body.originalUrl, req.user.id);
+		return this.urlsService.update(id, body.url, req.user.id);
 	}
 
 	@UseGuards(JwtAuthGuard)
