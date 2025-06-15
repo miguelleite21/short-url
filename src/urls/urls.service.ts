@@ -19,7 +19,7 @@ export class UrlsService {
 			clickCount: 0
 		});
 		await this.em.persistAndFlush(url);
-		const { owner: _, ...rest } = url;
+		const { owner, ...rest } = url;
 		return {
 			...rest,
 			createdAt: url.createdAt
