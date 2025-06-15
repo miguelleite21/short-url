@@ -1,98 +1,159 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Short URL API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API para encurtar URLs que permite uso por usuários autenticados e não autenticados. Usuários autenticados podem criar, listar, editar, deletar URLs e ver estatísticas de cliques. Usuários não autenticados podem apenas criar e acessar URLs.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologias
 
-## Description
+- Node.js v23.9.0
+- NestJS v11.1.3
+- PostgreSQL (via Docker Compose)
+- Yarn v1.22.22
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Instalação
 
-## Project setup
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/miguelleite21/shortURL
+   cd short-url
+   ```
 
-```bash
-$ yarn install
-```
+2. Instale as dependências:
+   ```bash
+   yarn install
+   ```
 
-## Compile and run the project
+3. Inicie o banco de dados PostgreSQL via Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
 
-```bash
-# development
-$ yarn run start
+## Configuração
 
-# watch mode
-$ yarn run start:dev
+1. Copie o arquivo `.env.example` para `.env` e ajuste as variáveis conforme necessário:
+   ```bash
+   cp .env.example .env
+   ```
 
-# production mode
-$ yarn run start:prod
-```
+   As variáveis disponíveis são:
+   - `PORT`: Porta da aplicação (padrão: 3000)
+   - `DB_HOST`: Host do banco de dados (padrão: localhost)
+   - `DB_PORT`: Porta do banco de dados (padrão: 5432)
+   - `DB_NAME`: Nome do banco de dados (padrão: shorturl)
+   - `DB_USER`: Usuário do banco de dados (padrão: postgres)
+   - `DB_PASS`: Senha do banco de dados (padrão: postgres)
+   - `JWT_SECRET`: Chave secreta para tokens JWT (exemplo: sua_chave_super_secreta)
+   - `JWT_EXPIRES_IN`: Tempo de expiração dos tokens JWT (padrão: 12h)
+   - `BASE_URL`: URL base da aplicação (padrão: http://localhost:3000)
 
-## Run tests
+2. Aplique as migrações do banco de dados:
+   ```bash
+   yarn migrate
+   ```
 
-```bash
-# unit tests
-$ yarn run test
+## Execução
 
-# e2e tests
-$ yarn run test:e2e
+- Para rodar em modo de desenvolvimento:
+  ```bash
+  yarn start:dev
+  ```
 
-# test coverage
-$ yarn run test:cov
-```
+- Para rodar em modo de produção:
+  ```bash
+  yarn start:prod
+  ```
 
-## Deployment
+A aplicação estará disponível em `http://localhost:3000` por padrão.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Uso
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Autenticação
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
+- **Registro**:
+  - Endpoint: `POST /auth/register`
+  - Requisitos: Email válido e senha com no mínimo 6 caracteres.
+  - Exemplo:
+    ```bash
+    curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"email": "user@example.com", "password": "strongpassword"}'
+    ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- **Login**:
+  - Endpoint: `POST /auth/login`
+  - Requisitos: Email válido e senha correta.
+  - Exemplo:
+    ```bash
+    curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"email": "user@example.com", "password": "strongpassword"}'
+    ```
 
-## Resources
+### Endpoints
 
-Check out a few resources that may come in handy when working with NestJS:
+#### Criar URL encurtada
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Método**: `POST /urls/shorten`
+- **Descrição**: Cria uma nova URL encurtada a partir de uma URL original fornecida. Usuários autenticados podem associar a URL à sua conta, mas a autenticação é opcional.
+- **Autenticação**: Não requerida (autenticação opcional com token JWT no header `Authorization`).
+- **Payload**:
+  ```json
+  { "url": "https://example.com" }
+  ```
+- **Exemplo (sem autenticação)**:
+  ```bash
+  curl -X POST http://localhost:3000/urls/shorten -H "Content-Type: application/json" -d '{"url": "https://example.com"}'
+  ```
+- **Exemplo (com autenticação)**:
+  ```bash
+  curl -X POST http://localhost:3000/urls/shorten -H "Content-Type: application/json" -H "Authorization: Bearer seu_token" -d '{"url": "https://example.com"}'
+  ```
 
-## Support
+#### Acessar URL encurtada
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Método**: `GET /:slug`
+- **Descrição**: Redireciona para a URL original associada ao slug fornecido e incrementa o contador de cliques da URL.
+- **Autenticação**: Não requerida.
+- **Exemplo**:
+  ```bash
+  curl http://localhost:3000/abc123
+  ```
+- **Nota**: Este endpoint realiza um redirecionamento HTTP para a URL original.
 
-## Stay in touch
+#### Listar URLs do usuário
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- **Método**: `GET /urls/list`
+- **Descrição**: Retorna uma lista de todas as URLs encurtadas criadas pelo usuário autenticado.
+- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
+- **Exemplo**:
+  ```bash
+  curl -X GET http://localhost:3000/urls/list -H "Authorization: Bearer seu_token"
+  ```
 
-## License
+#### Atualizar URL encurtada
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- **Método**: `PUT /urls/:id`
+- **Descrição**: Atualiza a URL original associada a um ID específico. Apenas o criador da URL pode modificá-la.
+- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
+- **Payload**:
+  ```json
+  { "url": "https://new-url.com" }
+  ```
+- **Exemplo**:
+  ```bash
+  curl -X PUT http://localhost:3000/urls/1 -H "Authorization: Bearer seu_token" -H "Content-Type: application/json" -d '{"url": "https://new-url.com"}'
+  ```
+
+#### Deletar URL encurtada
+
+- **Método**: `DELETE /urls/:id`
+- **Descrição**: Deleta uma URL encurtada pelo ID. Apenas o criador da URL pode deletá-la.
+- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
+- **Exemplo**:
+  ```bash
+  curl -X DELETE http://localhost:3000/urls/1 -H "Authorization: Bearer seu_token"
+  ```
+
+## Testes
+
+- Para rodar testes unitários:
+  ```bash
+  yarn test
+  ```
+
+
