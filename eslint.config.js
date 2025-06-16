@@ -1,4 +1,3 @@
-// eslint.config.js
 import eslint from "@eslint/js";
 import ts from "@typescript-eslint/eslint-plugin";
 import * as parser from "@typescript-eslint/parser";
@@ -52,6 +51,22 @@ export default [
 					printWidth: 100
 				}
 			]
+		}
+	},
+	{
+		files: ["**/*.spec.ts", "**/*.test.ts"],
+		languageOptions: {
+			parser,
+			parserOptions: {
+				project: "./tsconfig.json",
+				tsconfigRootDir: import.meta.dirname,
+				sourceType: "module"
+			}
+		},
+		rules: {
+			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/no-unsafe-call": "off"
 		}
 	},
 	prettier
