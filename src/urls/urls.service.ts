@@ -1,14 +1,20 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { ShortUrl } from "./entities/url.entity";
 import { FormattedCreateUrl, FormattedUrl } from "./dto/url-return.dto";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class UrlsService {
 	private readonly alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	private readonly slugLength = 6;
 
-	constructor(private readonly em: EntityManager) {}
+	constructor(
+		private readonly em: EntityManager,
+		@Inject(CACHE_MANAGER)
+		private cache: Cache
+	) {}
 
 	async shorten(Url: string, userId?: number): Promise<FormattedCreateUrl> {
 		const shortCode = await this.generateUniqueSlug();
@@ -47,8 +53,12 @@ export class UrlsService {
 	}
 
 	async findByShortCode(shortCode: string): Promise<ShortUrl> {
+		const cacheKey = `shorturl:${shortCode}`;
+		const cached = await this.cache.get<ShortUrl>(cacheKey);
+		if (cached) return cached;
 		const url = await this.em.findOne(ShortUrl, { shortCode, deletedAt: null });
 		if (!url) throw new NotFoundException("URL not found");
+		await this.cache.set(cacheKey, url, 30);
 		return url;
 	}
 

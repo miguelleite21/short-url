@@ -7,8 +7,9 @@ API para encurtar URLs que permite uso por usuários autenticados e não autenti
 - Node.js v23.9.0
 - NestJS v11.1.3
 - PostgreSQL (via Docker Compose)
+- Redis (cache)
 - Yarn v1.22.22
-
+- Swagger
 ## Instalação
 
 1. Clone o repositório:
@@ -44,6 +45,10 @@ API para encurtar URLs que permite uso por usuários autenticados e não autenti
    - `JWT_SECRET`: Chave secreta para tokens JWT (exemplo: sua_chave_super_secreta)
    - `JWT_EXPIRES_IN`: Tempo de expiração dos tokens JWT (padrão: 12h)
    - `BASE_URL`: URL base da aplicação (padrão: http://localhost:3000)
+   - `CACHE_HOST`: Host do Redis (padrão: localhost)
+   - `CACHE_PORT`: Porta do Redis (padrão: 6379)
+   - `CACHE_USERNAME`: Usuário do Redis (opcional)
+   - `CACHE_PASSWORD`: Senha do Redis (opcional)
 
 2. Aplique as migrações do banco de dados:
    ```bash
@@ -148,6 +153,20 @@ A aplicação estará disponível em `http://localhost:3000` por padrão.
   ```bash
   curl -X DELETE http://localhost:3000/urls/1 -H "Authorization: Bearer seu_token"
   ```
+## Documentação da API
+
+A API é documentada usando Swagger, que fornece uma interface interativa para explorar e testar os endpoints. Para acessar a documentação:
+
+1. Inicie a aplicação:
+   ```bash
+   yarn start:dev
+   ```
+2. Acesse `http://localhost:3000/api` no seu navegador ou ferramenta de requisições HTTP.
+
+Na interface do Swagger, você pode:
+- Visualizar todos os endpoints disponíveis, incluindo esquemas de entrada e saída.
+- Testar requisições diretamente, incluindo autenticação com tokens JWT.
+- Ver exemplos de payloads e respostas esperadas.
 
 ## Testes
 
@@ -155,5 +174,7 @@ A aplicação estará disponível em `http://localhost:3000` por padrão.
   ```bash
   yarn test
   ```
+
+
 
 
