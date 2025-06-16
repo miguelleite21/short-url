@@ -68,6 +68,13 @@ API para encurtar URLs que permite uso por usuários autenticados e não autenti
   ```
 
 A aplicação estará disponível em `http://localhost:3000` por padrão.
+## Executando com Docker Compose
+
+- Se preferir rodar a aplicação junto com o banco de dados e o Redis usando containers, utilize o Docker Compose:
+
+```bash
+docker-compose up --build
+```
 
 ## Uso
 
