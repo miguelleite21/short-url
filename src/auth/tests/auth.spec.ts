@@ -7,7 +7,6 @@ import { faker } from "@faker-js/faker";
 import { User } from "src/user/user.entity";
 import { AuthService } from "src/auth/auth.service";
 
-// Mock do bcrypt
 vi.mock("bcrypt", () => ({
 	hash: vi.fn(),
 	compare: vi.fn()

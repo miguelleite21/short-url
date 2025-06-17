@@ -24,7 +24,7 @@ services:
     networks:
       - backend
 
-  app: # <-- aqui estava errado (um espaço a mais antes de "app")
+  app: 
     build: .
     depends_on:
       - db
