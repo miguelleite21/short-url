@@ -12,32 +12,21 @@ API para encurtar URLs que permite uso por usuários autenticados e não autenti
 - Swagger
 ## Instalação
 
-1. Clone o repositório:
+- Clone o repositório:
    ```bash
-   git clone https://github.com/miguelleite21/shortURL
+   git clone https://github.com/miguelleite21/short-url.git
    cd short-url
    ```
-
-2. Instale as dependências:
-   ```bash
-   yarn install
-   ```
-
-3. Inicie o banco de dados PostgreSQL via Docker Compose:
-   ```bash
-   docker-compose up -d
-   ```
-
 ## Configuração
 
-1. Copie o arquivo `.env.example` para `.env` e ajuste as variáveis conforme necessário:
+- Copie o arquivo `.env.example` para `.env` e ajuste as variáveis conforme necessário:
    ```bash
    cp .env.example .env
    ```
 
    As variáveis disponíveis são:
    - `PORT`: Porta da aplicação (padrão: 3000)
-   - `DB_HOST`: Host do banco de dados (padrão: localhost)
+   - `DB_HOST`: Host do banco de dados (use `db` para Docker Compose, ou `localhost` para desenvolvimento local)
    - `DB_PORT`: Porta do banco de dados (padrão: 5432)
    - `DB_NAME`: Nome do banco de dados (padrão: shorturl)
    - `DB_USER`: Usuário do banco de dados (padrão: postgres)
@@ -50,116 +39,19 @@ API para encurtar URLs que permite uso por usuários autenticados e não autenti
    - `CACHE_USERNAME`: Usuário do Redis (opcional)
    - `CACHE_PASSWORD`: Senha do Redis (opcional)
 
-2. Aplique as migrações do banco de dados:
-   ```bash
-   yarn migrate
-   ```
-
 ## Execução
 
-- Para rodar em modo de desenvolvimento:
-  ```bash
-  yarn start:dev
-  ```
-
-- Para rodar em modo de produção:
-  ```bash
-  yarn start:prod
-  ```
-
-A aplicação estará disponível em `http://localhost:3000` por padrão.
-## Executando com Docker Compose
-
-- Se preferir rodar a aplicação junto com o banco de dados e o Redis usando containers, utilize o Docker Compose:
+1. Para rodar a aplicação junto com o banco de dados e o Redis usando containers, utilize o Docker Compose:
 
 ```bash
-docker-compose up --build
+docker compose up --build -d
 ```
 
-## Uso
+2. E depois para executar as migrations:
+```bash
+docker compose exec app yarn migrate
+```
 
-### Autenticação
-
-- **Registro**:
-  - Endpoint: `POST /auth/register`
-  - Requisitos: Email válido e senha com no mínimo 6 caracteres.
-  - Exemplo:
-    ```bash
-    curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"email": "user@example.com", "password": "strongpassword"}'
-    ```
-
-- **Login**:
-  - Endpoint: `POST /auth/login`
-  - Requisitos: Email válido e senha correta.
-  - Exemplo:
-    ```bash
-    curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d '{"email": "user@example.com", "password": "strongpassword"}'
-    ```
-
-### Endpoints
-
-#### Criar URL encurtada
-
-- **Método**: `POST /urls/shorten`
-- **Descrição**: Cria uma nova URL encurtada a partir de uma URL original fornecida. Usuários autenticados podem associar a URL à sua conta, mas a autenticação é opcional.
-- **Autenticação**: Não requerida (autenticação opcional com token JWT no header `Authorization`).
-- **Payload**:
-  ```json
-  { "url": "https://example.com" }
-  ```
-- **Exemplo (sem autenticação)**:
-  ```bash
-  curl -X POST http://localhost:3000/urls/shorten -H "Content-Type: application/json" -d '{"url": "https://example.com"}'
-  ```
-- **Exemplo (com autenticação)**:
-  ```bash
-  curl -X POST http://localhost:3000/urls/shorten -H "Content-Type: application/json" -H "Authorization: Bearer seu_token" -d '{"url": "https://example.com"}'
-  ```
-
-#### Acessar URL encurtada
-
-- **Método**: `GET /:slug`
-- **Descrição**: Redireciona para a URL original associada ao slug fornecido e incrementa o contador de cliques da URL.
-- **Autenticação**: Não requerida.
-- **Exemplo**:
-  ```bash
-  curl http://localhost:3000/abc123
-  ```
-- **Nota**: Este endpoint realiza um redirecionamento HTTP para a URL original.
-
-#### Listar URLs do usuário
-
-- **Método**: `GET /urls/list`
-- **Descrição**: Retorna uma lista de todas as URLs encurtadas criadas pelo usuário autenticado.
-- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
-- **Exemplo**:
-  ```bash
-  curl -X GET http://localhost:3000/urls/list -H "Authorization: Bearer seu_token"
-  ```
-
-#### Atualizar URL encurtada
-
-- **Método**: `PUT /urls/:id`
-- **Descrição**: Atualiza a URL original associada a um ID específico. Apenas o criador da URL pode modificá-la.
-- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
-- **Payload**:
-  ```json
-  { "url": "https://new-url.com" }
-  ```
-- **Exemplo**:
-  ```bash
-  curl -X PUT http://localhost:3000/urls/1 -H "Authorization: Bearer seu_token" -H "Content-Type: application/json" -d '{"url": "https://new-url.com"}'
-  ```
-
-#### Deletar URL encurtada
-
-- **Método**: `DELETE /urls/:id`
-- **Descrição**: Deleta uma URL encurtada pelo ID. Apenas o criador da URL pode deletá-la.
-- **Autenticação**: Requerida (use o token JWT no header `Authorization`).
-- **Exemplo**:
-  ```bash
-  curl -X DELETE http://localhost:3000/urls/1 -H "Authorization: Bearer seu_token"
-  ```
 ## Documentação da API
 
 A API é documentada usando Swagger, que fornece uma interface interativa para explorar e testar os endpoints. Para acessar a documentação:

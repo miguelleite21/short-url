@@ -21,7 +21,8 @@
     "migration:force": "npx mikro-orm migration:up",
     "migration:pending": "npx mikro-orm migration:pending",
     "migration:fresh": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:fresh",
-    "migrate": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:up"
+    "migrate:run": "ts-node scripts/confirm-migration.ts && npx mikro-orm migration:up",
+    "migrate": "npx mikro-orm migration:up --config ./mikro-orm.config.js"
   },
   "dependencies": {
     "@keyv/redis": "^4.4.0",
