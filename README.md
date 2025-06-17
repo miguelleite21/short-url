@@ -55,12 +55,7 @@ docker compose exec app yarn migrate
 ## Documentação da API
 
 A API é documentada usando Swagger, que fornece uma interface interativa para explorar e testar os endpoints. Para acessar a documentação:
-
-1. Inicie a aplicação:
-   ```bash
-   yarn start:dev
-   ```
-2. Acesse `http://localhost:3000/api` no seu navegador ou ferramenta de requisições HTTP.
+- Acesse `http://localhost:3000/api` no seu navegador ou ferramenta de requisições HTTP.
 
 Na interface do Swagger, você pode:
 - Visualizar todos os endpoints disponíveis, incluindo esquemas de entrada e saída.
