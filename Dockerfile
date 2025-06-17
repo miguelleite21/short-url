@@ -16,4 +16,6 @@ RUN yarn install --frozen-lockfile
 COPY --from=builder /app/dist ./dist
 COPY tsconfig.json ./tsconfig.json
 COPY mikro-orm.config.* ./
+COPY migrations ./migrations
+
 CMD ["node", "dist/main"]

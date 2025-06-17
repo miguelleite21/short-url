@@ -7,7 +7,7 @@ module.exports = {
   },
   entities: ['./dist/urls/entities/*.entity.js', './dist/user/*.entity.js'],
   migrations: {
-    path: './dist/migrations',
+    path: './migrations',
     transactional: false,
   },
   dbName:   process.env.DB_NAME,
